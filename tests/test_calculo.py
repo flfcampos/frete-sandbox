@@ -46,6 +46,46 @@ def test_entradas_invalidas_levantam_value_error(peso, distancia, modalidade):
         calcular_frete(peso, distancia, modalidade)
 
 
+def test_frete_economico_aplica_multiplicador_e_prazo():
+    # 20.00 * 0.8 = 16.00
+    cotacao = calcular_frete(2, 100, "economica")
+    assert cotacao.valor == Decimal("16.00")
+    assert cotacao.prazo_dias == 8
+    assert cotacao.modalidade == "economica"
+
+
+def test_frete_economico_prazo_aumenta_a_cada_500_km():
+    assert calcular_frete(1, 1000, "economica").prazo_dias == 10
+
+
+def test_mensagem_modalidade_invalida_lista_economica():
+    with pytest.raises(ValueError, match="economica"):
+        calcular_frete(1, 10, "teletransporte")
+
+
+def test_frete_gratis_padrao_a_partir_de_300():
+    cotacao = calcular_frete(2, 100, valor_pedido=300)
+    assert cotacao.valor == Decimal("0.00")
+    assert cotacao.prazo_dias == 5
+
+
+def test_frete_cobrado_abaixo_de_300():
+    assert calcular_frete(2, 100, valor_pedido=299.99).valor == Decimal("20.00")
+
+
+def test_frete_gratis_aceita_decimal():
+    assert calcular_frete(2, 100, valor_pedido=Decimal("300.00")).valor == Decimal("0.00")
+
+
+def test_frete_gratis_nao_se_aplica_a_expressa():
+    assert calcular_frete(2, 100, "expressa", valor_pedido=500).valor == Decimal("30.00")
+
+
+def test_valor_pedido_negativo_levanta_value_error():
+    with pytest.raises(ValueError):
+        calcular_frete(2, 100, valor_pedido=-1)
+
+
 def test_peso_cubado_maior_que_real_e_usado():
     # cubado = 60*50*40/6000 = 20 kg -> 10 + 20*2.50 = 60.00
     assert calcular_frete(1, 0, dimensoes_cm=(60, 50, 40)).valor == Decimal("60.00")
