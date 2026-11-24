@@ -14,6 +14,7 @@ TAXA_BASE = Decimal("10.00")
 PRECO_POR_KG = Decimal("2.50")
 PRECO_POR_KM = Decimal("0.05")
 PESO_MAXIMO_KG = Decimal("30")
+DIVISOR_CUBAGEM = Decimal("6000")
 
 
 @dataclass(frozen=True)
@@ -44,6 +45,7 @@ def calcular_frete(
     peso_kg: float | Decimal,
     distancia_km: float | Decimal,
     modalidade: str = "padrao",
+    dimensoes_cm: tuple[float, float, float] | None = None,
 ) -> Cotacao:
     """Calcula o valor e o prazo do frete.
 
@@ -65,8 +67,16 @@ def calcular_frete(
             f"Opções: {', '.join(sorted(MODALIDADES))}"
         )
 
+    peso_tarifavel = peso
+    if dimensoes_cm is not None:
+        dims = [Decimal(str(d)) for d in dimensoes_cm]
+        if len(dims) != 3 or any(d <= 0 for d in dims):
+            raise ValueError("dimensoes_cm deve ter 3 valores maiores que zero")
+        cubado = dims[0] * dims[1] * dims[2] / DIVISOR_CUBAGEM
+        peso_tarifavel = max(peso, cubado)
+
     mod = MODALIDADES[modalidade]
-    bruto = TAXA_BASE + peso * PRECO_POR_KG + distancia * PRECO_POR_KM
+    bruto = TAXA_BASE + peso_tarifavel * PRECO_POR_KG + distancia * PRECO_POR_KM
     valor = (bruto * mod.multiplicador).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
     return Cotacao(

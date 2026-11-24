@@ -44,3 +44,20 @@ def test_arredondamento_duas_casas():
 def test_entradas_invalidas_levantam_value_error(peso, distancia, modalidade):
     with pytest.raises(ValueError):
         calcular_frete(peso, distancia, modalidade)
+
+
+def test_peso_cubado_maior_que_real():
+    assert calcular_frete(1, 0, dimensoes_cm=(60, 50, 40)).valor == Decimal("60.00")
+
+
+def test_peso_real_maior_que_cubado():
+    assert calcular_frete(5, 0, dimensoes_cm=(10, 10, 10)).valor == Decimal("22.50")
+
+
+def test_dimensoes_invalidas():
+    with pytest.raises(ValueError):
+        calcular_frete(1, 0, dimensoes_cm=(0, 10, 10))
+
+
+def test_cubado_nao_afeta_limite_de_peso_real():
+    assert calcular_frete(30, 0, dimensoes_cm=(10, 10, 10)).valor == Decimal("85.00")
