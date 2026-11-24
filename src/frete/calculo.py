@@ -25,6 +25,7 @@ class Modalidade:
 MODALIDADES: dict[str, Modalidade] = {
     "padrao": Modalidade(multiplicador=Decimal("1.0"), prazo_base_dias=5),
     "expressa": Modalidade(multiplicador=Decimal("1.5"), prazo_base_dias=2),
+    "economica": Modalidade(multiplicador=Decimal("0.8"), prazo_base_dias=8),
 }
 
 
