@@ -44,3 +44,22 @@ def test_arredondamento_duas_casas():
 def test_entradas_invalidas_levantam_value_error(peso, distancia, modalidade):
     with pytest.raises(ValueError):
         calcular_frete(peso, distancia, modalidade)
+
+
+def test_frete_gratis_padrao_a_partir_de_300():
+    cotacao = calcular_frete(2, 100, valor_pedido=300)
+    assert cotacao.valor == Decimal("0.00")
+    assert cotacao.prazo_dias == 5
+
+
+def test_sem_frete_gratis_abaixo_de_300():
+    assert calcular_frete(2, 100, valor_pedido=299.99).valor == Decimal("20.00")
+
+
+def test_expressa_nao_tem_frete_gratis():
+    assert calcular_frete(2, 100, "expressa", valor_pedido=500).valor == Decimal("30.00")
+
+
+def test_valor_pedido_negativo():
+    with pytest.raises(ValueError):
+        calcular_frete(2, 100, valor_pedido=-1)

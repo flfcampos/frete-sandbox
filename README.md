@@ -17,6 +17,7 @@ print(cotacao.valor, cotacao.prazo_dias)  # 30.00 2
 - Modalidades: `padrao` (x1.0, 5 dias) e `expressa` (x1.5, 2 dias)
 - Prazo: +1 dia a cada 500 km completos
 - Peso entre 0 (exclusivo) e 30 kg; distância >= 0
+- Frete grátis: na modalidade `padrao`, com `valor_pedido` (opcional, default 0) >= 300, o valor é 0.00 (prazo inalterado); `valor_pedido` negativo levanta `ValueError`
 - Valor arredondado para 2 casas (ROUND_HALF_UP)
 
 ## Desenvolvimento
