@@ -61,3 +61,26 @@ def test_frete_economico_prazo_aumenta_a_cada_500_km():
 def test_mensagem_modalidade_invalida_lista_economica():
     with pytest.raises(ValueError, match="economica"):
         calcular_frete(1, 10, "teletransporte")
+
+
+def test_frete_gratis_padrao_a_partir_de_300():
+    cotacao = calcular_frete(2, 100, valor_pedido=300)
+    assert cotacao.valor == Decimal("0.00")
+    assert cotacao.prazo_dias == 5
+
+
+def test_frete_cobrado_abaixo_de_300():
+    assert calcular_frete(2, 100, valor_pedido=299.99).valor == Decimal("20.00")
+
+
+def test_frete_gratis_aceita_decimal():
+    assert calcular_frete(2, 100, valor_pedido=Decimal("300.00")).valor == Decimal("0.00")
+
+
+def test_frete_gratis_nao_se_aplica_a_expressa():
+    assert calcular_frete(2, 100, "expressa", valor_pedido=500).valor == Decimal("30.00")
+
+
+def test_valor_pedido_negativo_levanta_value_error():
+    with pytest.raises(ValueError):
+        calcular_frete(2, 100, valor_pedido=-1)

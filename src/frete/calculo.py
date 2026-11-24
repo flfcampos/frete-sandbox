@@ -14,6 +14,8 @@ TAXA_BASE = Decimal("10.00")
 PRECO_POR_KG = Decimal("2.50")
 PRECO_POR_KM = Decimal("0.05")
 PESO_MAXIMO_KG = Decimal("30")
+VALOR_MINIMO_FRETE_GRATIS = Decimal("300")
+MODALIDADES_FRETE_GRATIS = frozenset({"padrao"})
 
 
 @dataclass(frozen=True)
@@ -45,14 +47,20 @@ def calcular_frete(
     peso_kg: float | Decimal,
     distancia_km: float | Decimal,
     modalidade: str = "padrao",
+    valor_pedido: float | Decimal = 0,
 ) -> Cotacao:
     """Calcula o valor e o prazo do frete.
 
+    Pedidos com ``valor_pedido`` a partir de R$ 300 na modalidade ``padrao``
+    têm frete grátis (o prazo não muda).
+
     Raises:
-        ValueError: se peso/distância forem inválidos ou a modalidade não existir.
+        ValueError: se peso/distância/valor do pedido forem inválidos ou a
+            modalidade não existir.
     """
     peso = Decimal(str(peso_kg))
     distancia = Decimal(str(distancia_km))
+    pedido = Decimal(str(valor_pedido))
 
     if peso <= 0:
         raise ValueError("peso_kg deve ser maior que zero")
@@ -60,6 +68,8 @@ def calcular_frete(
         raise ValueError(f"peso_kg excede o máximo de {PESO_MAXIMO_KG} kg")
     if distancia < 0:
         raise ValueError("distancia_km não pode ser negativa")
+    if pedido < 0:
+        raise ValueError("valor_pedido não pode ser negativo")
     if modalidade not in MODALIDADES:
         raise ValueError(
             f"modalidade inválida: {modalidade!r}. "
@@ -69,6 +79,8 @@ def calcular_frete(
     mod = MODALIDADES[modalidade]
     bruto = TAXA_BASE + peso * PRECO_POR_KG + distancia * PRECO_POR_KM
     valor = (bruto * mod.multiplicador).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    if modalidade in MODALIDADES_FRETE_GRATIS and pedido >= VALOR_MINIMO_FRETE_GRATIS:
+        valor = Decimal("0.00")
 
     return Cotacao(
         valor=valor,
