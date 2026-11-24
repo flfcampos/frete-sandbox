@@ -44,3 +44,20 @@ def test_arredondamento_duas_casas():
 def test_entradas_invalidas_levantam_value_error(peso, distancia, modalidade):
     with pytest.raises(ValueError):
         calcular_frete(peso, distancia, modalidade)
+
+
+def test_economica_valor():
+    assert calcular_frete(2, 100, "economica").valor == Decimal("16.00")
+
+
+def test_economica_prazo_base():
+    assert calcular_frete(2, 100, "economica").prazo_dias == 8
+
+
+def test_economica_prazo_com_distancia():
+    assert calcular_frete(1, 1000, "economica").prazo_dias == 10
+
+
+def test_erro_modalidade_invalida_lista_economica():
+    with pytest.raises(ValueError, match="economica"):
+        calcular_frete(1, 10, "teletransporte")

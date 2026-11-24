@@ -14,7 +14,7 @@ print(cotacao.valor, cotacao.prazo_dias)  # 30.00 2
 ## Regras
 
 - `valor = (10.00 + peso_kg * 2.50 + distancia_km * 0.05) * multiplicador`
-- Modalidades: `padrao` (x1.0, 5 dias) e `expressa` (x1.5, 2 dias)
+- Modalidades: `padrao` (x1.0, 5 dias), `expressa` (x1.5, 2 dias) e `economica` (x0.8, 8 dias)
 - Prazo: +1 dia a cada 500 km completos
 - Peso entre 0 (exclusivo) e 30 kg; distância >= 0
 - Valor arredondado para 2 casas (ROUND_HALF_UP)
