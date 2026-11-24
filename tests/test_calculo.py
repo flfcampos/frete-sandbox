@@ -44,3 +44,38 @@ def test_arredondamento_duas_casas():
 def test_entradas_invalidas_levantam_value_error(peso, distancia, modalidade):
     with pytest.raises(ValueError):
         calcular_frete(peso, distancia, modalidade)
+
+
+def test_peso_cubado_maior_que_real_e_usado():
+    # cubado = 60*50*40/6000 = 20 kg -> 10 + 20*2.50 = 60.00
+    assert calcular_frete(1, 0, dimensoes_cm=(60, 50, 40)).valor == Decimal("60.00")
+
+
+def test_peso_real_maior_que_cubado_e_usado():
+    # cubado = 1000/6000 = 0.1667 kg < 5 kg -> 10 + 5*2.50 = 22.50
+    assert calcular_frete(5, 0, dimensoes_cm=(10, 10, 10)).valor == Decimal("22.50")
+
+
+def test_sem_dimensoes_mantem_comportamento():
+    assert calcular_frete(2, 100).valor == Decimal("20.00")
+    assert calcular_frete(2, 100, dimensoes_cm=None).valor == Decimal("20.00")
+
+
+def test_peso_cubado_acima_de_30kg_e_permitido():
+    # limite de 30 kg vale só para o peso real; cubado = 100*60*60/6000 = 60 kg
+    assert calcular_frete(1, 0, dimensoes_cm=(100, 60, 60)).valor == Decimal("160.00")
+
+
+def test_peso_cubado_com_modalidade_expressa():
+    # (10 + 20*2.50) * 1.5 = 90.00
+    cotacao = calcular_frete(1, 0, "expressa", dimensoes_cm=(60, 50, 40))
+    assert cotacao.valor == Decimal("90.00")
+
+
+@pytest.mark.parametrize(
+    "dimensoes",
+    [(0, 10, 10), (10, -1, 10), (10, 10, 0), (10, 10)],
+)
+def test_dimensoes_invalidas_levantam_value_error(dimensoes):
+    with pytest.raises(ValueError):
+        calcular_frete(1, 0, dimensoes_cm=dimensoes)
