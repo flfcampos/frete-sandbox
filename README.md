@@ -17,6 +17,7 @@ print(cotacao.valor, cotacao.prazo_dias)  # 30.00 2
 - Modalidades: `padrao` (x1.0, 5 dias) e `expressa` (x1.5, 2 dias)
 - Prazo: +1 dia a cada 500 km completos
 - Peso entre 0 (exclusivo) e 30 kg; distância >= 0
+- Peso cubado (opcional, `dimensoes_cm=(C, L, A)`): `C × L × A / 6000` kg; o peso tarifável é `max(peso_kg, peso_cubado)` e entra na fórmula do valor. O limite de 30 kg vale só para o peso real; dimensões `<= 0` geram `ValueError`
 - Valor arredondado para 2 casas (ROUND_HALF_UP)
 
 ## Desenvolvimento
